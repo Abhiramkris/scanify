@@ -30,6 +30,17 @@ COPY . /var/www/
 # Install dependencies
 RUN composer install --optimize-autoloader --no-dev
 
+# Copy .env.example to .env if .env doesn't exist
+RUN if [ ! -f .env ]; then cp .env.example .env; fi
+
+# Generate application key if APP_KEY is not set
+RUN php artisan key:generate --force
+
+# Cache configuration
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www
 RUN chmod -R 755 /var/www/storage
