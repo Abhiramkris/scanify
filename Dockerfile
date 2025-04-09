@@ -33,14 +33,6 @@ RUN composer install --optimize-autoloader --no-dev
 # Copy .env.example to .env if .env doesn't exist
 RUN if [ ! -f .env ]; then cp .env.example .env; fi
 
-# Generate application key if APP_KEY is not set
-RUN php artisan key:generate --force
-
-# Cache configuration
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
-
 # Set permissions
 RUN chown -R www-data:www-data /var/www
 RUN chmod -R 755 /var/www/storage
@@ -56,5 +48,14 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Expose port 80
 EXPOSE 80
 
-# Start supervisord
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Create entrypoint script
+RUN echo '#!/bin/sh' > /entrypoint.sh && \
+    echo 'php artisan key:generate --force' >> /entrypoint.sh && \
+    echo 'php artisan config:cache' >> /entrypoint.sh && \
+    echo 'php artisan route:cache' >> /entrypoint.sh && \
+    echo 'php artisan view:cache' >> /entrypoint.sh && \
+    echo 'exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+# Start with entrypoint script
+CMD ["/entrypoint.sh"]
