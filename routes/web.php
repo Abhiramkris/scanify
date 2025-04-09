@@ -27,7 +27,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('restaurants', RestaurantController::class)->except(['show']);
     
     // Menu Type Management
-  //  Route::resource('restaurants.menu-types', MenuTypeController::class)->shallow();
+    Route::resource('restaurants.menu-types', MenuTypeController::class)->shallow();
     
     // Add direct route for menu types
     Route::get('/menu-types', [MenuTypeController::class, 'index'])->name('menu-types.index');

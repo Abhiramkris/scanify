@@ -45,17 +45,24 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 # Configure supervisord
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+
+
 # Expose port 80
 EXPOSE 80
+RUN chmod -R 775 /var/www/bootstrap/cache
 
 # Create entrypoint script
 RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo 'php artisan key:generate --force' >> /entrypoint.sh && \
     echo 'php artisan config:cache' >> /entrypoint.sh && \
-    echo 'php artisan route:cache' >> /entrypoint.sh && \
+   # echo 'php artisan route:cache' >> /entrypoint.sh && \
     echo 'php artisan view:cache' >> /entrypoint.sh && \
     echo 'exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf' >> /entrypoint.sh && \
     chmod +x /entrypoint.sh
+
+RUN echo "display_errors = On" >> /usr/local/etc/php/conf.d/app.ini
+RUN echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/app.ini
+RUN echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/app.ini
 
 # Start with entrypoint script
 CMD ["/entrypoint.sh"]
