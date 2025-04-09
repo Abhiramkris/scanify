@@ -8,6 +8,7 @@ use App\Models\Restaurant;
 
 class DashboardController extends Controller
 {
+
     public function index()
     {
         if (auth()->user()->isSuperAdmin()) {
@@ -20,7 +21,20 @@ class DashboardController extends Controller
             $restaurants = Restaurant::where('user_id', auth()->id())->get();
             return view('dashboard.admin', compact('restaurants'));
         }
-        
-        return redirect()->route('home');
+        return redirect('/');
+       // return redirect()->route('home');
     }
+
+//     public function index()
+// {
+//     $user = auth()->user();
+    
+//     if ($user->role === 'super_admin') {
+//         return view('dashboard.super-admin');
+//     } elseif ($user->role === 'admin') {
+//         return view('dashboard.admin');
+//     } else {
+//         return view('dashboard.user');
+//     }
+// }
 }

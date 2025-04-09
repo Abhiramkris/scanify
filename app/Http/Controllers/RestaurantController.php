@@ -6,19 +6,21 @@ use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+
 
 class RestaurantController extends Controller
 {
     public function index()
     {
         $user = auth()->user();
-        
+
         if ($user->isSuperAdmin()) {
             $restaurants = Restaurant::with('user')->get();
         } else {
             $restaurants = $user->restaurants;
         }
-        
+
         return view('restaurants.index', compact('restaurants'));
     }
 
@@ -31,16 +33,15 @@ class RestaurantController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|max:255',
-            'slug' => 'nullable|unique:restaurants,slug',
+            'slug' => ['nullable', Rule::unique('restaurants', 'slug')],
             'description' => 'nullable',
             'address' => 'nullable',
             'phone' => 'nullable',
-            'background_color' => 'nullable|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
-            'text_color' => 'nullable|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
-            'button_color' => 'nullable|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
-            'logo' => 'nullable|image|max:1024',
+            'background_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'text_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'button_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'logo' => ['nullable', 'image', 'max:1024'],
         ]);
-
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
         }
@@ -65,17 +66,18 @@ class RestaurantController extends Controller
     public function update(Request $request, Restaurant $restaurant)
     {
         $this->authorize('update', $restaurant);
-        
+
+
         $validated = $request->validate([
             'name' => 'required|max:255',
             'slug' => ['nullable', Rule::unique('restaurants')->ignore($restaurant->id)],
             'description' => 'nullable',
             'address' => 'nullable',
             'phone' => 'nullable',
-            'background_color' => 'nullable|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
-            'text_color' => 'nullable|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
-            'button_color' => 'nullable|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
-            'logo' => 'nullable|image|max:1024',
+            'background_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'text_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'button_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'logo' => ['nullable', 'image', 'max:1024'],
         ]);
 
         if (empty($validated['slug'])) {
@@ -97,11 +99,11 @@ class RestaurantController extends Controller
     public function destroy(Restaurant $restaurant)
     {
         $this->authorize('delete', $restaurant);
-        
+
         if ($restaurant->logo) {
             Storage::disk('public')->delete($restaurant->logo);
         }
-        
+
         $restaurant->delete();
 
         return redirect()->route('restaurants.index')->with('success', 'Restaurant deleted successfully.');
@@ -110,12 +112,15 @@ class RestaurantController extends Controller
     public function show($slug)
     {
         $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
-        $menuTypes = $restaurant->menuTypes()->with(['categories' => function($query) {
-            $query->orderBy('display_order');
-        }, 'categories.menuItems' => function($query) {
-            $query->where('is_available', true);
-        }])->orderBy('display_order')->get();
-        
+        $menuTypes = $restaurant->menuTypes()->with([
+            'categories' => function ($query) {
+                $query->orderBy('display_order');
+            },
+            'categories.menuItems' => function ($query) {
+                $query->where('is_available', true);
+            }
+        ])->orderBy('display_order')->get();
+
         return view('restaurants.menu', compact('restaurant', 'menuTypes'));
     }
 }

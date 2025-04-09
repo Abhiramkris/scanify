@@ -1,0 +1,5 @@
+      <!-- <div class="d-flex justify-content-center mt-4">
+                        {{ $menuTypes->links() }}
+                    </div> --> 
+                    
+                     C:\code\scanify\resources\views\menu-types\index.blade.php: 73

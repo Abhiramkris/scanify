@@ -14,6 +14,7 @@
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Create New Admin
                     </a>
+                    
                 </div>
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -56,9 +57,13 @@
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mt-6">
                 <h3 class="text-lg font-medium mb-4">All Restaurants</h3>
+                <a href="{{ route('restaurants.index') }}"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        See all Restaurants
+                    </a>
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
-                        <tr>// resources/views/dashboard/super-admin.blade.php (continued)
+                        <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Name</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

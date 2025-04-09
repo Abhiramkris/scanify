@@ -25,4 +25,9 @@ class MenuType extends Model
     {
         return $this->hasMany(MenuCategory::class);
     }
+    // In your MenuType model
+public function menuItems()
+{
+    return $this->hasMany(MenuItem::class);
+}
 }
