@@ -11,6 +11,15 @@ class DashboardController extends Controller
 
     public function index()
     {
+        if (!auth()->user()->is_active) {
+            // Just invalidate the session
+            Session::flush();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+            
+            return redirect()->route('login')->with('error', 'Your account is inactive. Please contact the administrator.');
+        }
+        
         if (auth()->user()->isSuperAdmin()) {
             $admins = User::where('role', 'admin')->get();
             $restaurants = Restaurant::with('user')->get();

@@ -7,12 +7,10 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>{{ __('Edit Menu Type') }}</span>
-                    <a href="{{ route('menu-types.index') }}" class="btn btn-sm btn-secondary">{{ __('Back to List') }}</a>
-                </div>
+                    <a href="{{ route('restaurants.menu-types.index', ['restaurant' => $restaurant->id]) }}" class="btn btn-sm btn-secondary">{{ __('Back to List') }}</a>                </div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('menu-types.update', $menuType->id) }}">
-                        @csrf
+                <form method="POST" action="{{ route('menu-types.update', ['menu_type' => $menuType->id]) }}">                        @csrf
                         @method('PUT')
 
                         <div class="form-group row mb-3">

@@ -14,6 +14,7 @@ class MenuCategory extends Model
         'name',
         'description',
         'display_order',
+        'restaurant_id',
     ];
 
     public function menuType()

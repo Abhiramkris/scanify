@@ -21,6 +21,7 @@ class Restaurant extends Model
         'text_color',
         'button_color',
         'logo',
+        'is_active',
     ];
 
     protected static function boot()

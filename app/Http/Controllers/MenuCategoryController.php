@@ -30,9 +30,11 @@ class MenuCategoryController extends Controller
             'description' => 'nullable',
             'display_order' => 'nullable|integer',
         ]);
-
+        
+        // Add the restaurant_id from the associated menuType
+        $validated['restaurant_id'] = $menuType->restaurant_id;
+        
         $menuType->categories()->create($validated);
-
         return redirect()->route('menu-types.categories.index', $menuType)
             ->with('success', 'Category created successfully.');
     }
@@ -52,9 +54,10 @@ class MenuCategoryController extends Controller
             'description' => 'nullable',
             'display_order' => 'nullable|integer',
         ]);
-
+        
         $category->update($validated);
-
+        // Removed the duplicate create line that was here
+        
         return redirect()->route('menu-types.categories.index', $menuType)
             ->with('success', 'Category updated successfully.');
     }
@@ -63,7 +66,7 @@ class MenuCategoryController extends Controller
     {
         $this->authorize('update', $menuType->restaurant);
         $category->delete();
-
+        
         return redirect()->route('menu-types.categories.index', $menuType)
             ->with('success', 'Category deleted successfully.');
     }

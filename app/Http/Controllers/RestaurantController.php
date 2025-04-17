@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 
 class RestaurantController extends Controller
 {
-    public function index()
+    public function index(Restaurant $restaurant)
     {
         $user = auth()->user();
 
@@ -24,7 +24,7 @@ class RestaurantController extends Controller
         return view('restaurants.index', compact('restaurants'));
     }
 
-    public function create()
+    public function create(Restaurant $restaurant)
     {
         return view('restaurants.create');
     }
@@ -112,6 +112,16 @@ class RestaurantController extends Controller
     public function show($slug)
     {
         $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
+        
+        // Debug: Check what's happening
+        // dd($restaurant->is_active);
+        
+        
+        // Check if restaurant is active
+        if ($restaurant->is_active === false || $restaurant->is_active === 0) {
+            return view('restaurants.disabled', compact('restaurant'));
+        }
+        
         $menuTypes = $restaurant->menuTypes()->with([
             'categories' => function ($query) {
                 $query->orderBy('display_order');
@@ -120,7 +130,28 @@ class RestaurantController extends Controller
                 $query->where('is_available', true);
             }
         ])->orderBy('display_order')->get();
-
+        
+        
+        // Use a different view for public access
         return view('restaurants.menu', compact('restaurant', 'menuTypes'));
     }
+
+    // In RestaurantController.php
+  public function toggleStatus(Restaurant $restaurant)
+{
+   
+    // Explicitly set to the opposite value
+    if ($restaurant->is_active == true || $restaurant->is_active == 1) {
+        $restaurant->is_active = false;
+    } else {
+        $restaurant->is_active = true;
+    }
+    
+
+    
+    $restaurant->save();
+    
+    return back()->with('success', 'Restaurant status updated successfully');
+}
+
 }

@@ -61,7 +61,7 @@
 
                                     @foreach (Auth::user()->allTeams() as $team)
                                         <x-switchable-team :team="$team" />
-                                    @endforeach
+                                    @endforeach 
                                 </div>
                             </x-slot>
                         </x-dropdown>

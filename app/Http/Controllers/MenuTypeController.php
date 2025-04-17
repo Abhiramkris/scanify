@@ -24,7 +24,7 @@ class MenuTypeController extends Controller
     public function store(Request $request, Restaurant $restaurant)
     {
         $this->authorize('update', $restaurant);
-        
+
         $validated = $request->validate([
             'name' => 'required|max:255',
             'description' => 'nullable',
@@ -37,16 +37,27 @@ class MenuTypeController extends Controller
             ->with('success', 'Menu type created successfully.');
     }
 
-    public function edit(Restaurant $restaurant, MenuType $menuType)
+    public function edit(MenuType $menu_type)
     {
+        $restaurant = $menu_type->restaurant;
         $this->authorize('update', $restaurant);
+        
+        // Change variable name to match what the view expects
+        $menuType = $menu_type;
+        
         return view('menu-types.edit', compact('restaurant', 'menuType'));
+    }
+
+    public function show(Restaurant $restaurant, MenuType $menuType)
+    {
+        $this->authorize('view', $restaurant);
+        return view('menu-types.show', compact('restaurant', 'menuType'));
     }
 
     public function update(Request $request, Restaurant $restaurant, MenuType $menuType)
     {
         $this->authorize('update', $restaurant);
-        
+
         $validated = $request->validate([
             'name' => 'required|max:255',
             'description' => 'nullable',
@@ -55,8 +66,8 @@ class MenuTypeController extends Controller
 
         $menuType->update($validated);
 
-        return redirect()->route('restaurants.menu-types.index', $restaurant)
-            ->with('success', 'Menu type updated successfully.');
+        return redirect()->route('restaurants.menu-types.index', ['restaurant' => $menuType->restaurant_id])
+        ->with('success', 'Menu type updated successfully');
     }
 
     public function destroy(Restaurant $restaurant, MenuType $menuType)
